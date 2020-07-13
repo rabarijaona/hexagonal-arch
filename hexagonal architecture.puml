@@ -1,10 +1,9 @@
 @startuml
-package "Model" #fefefe {
+package "Domain" #fefefe {
+ package "Model" #fefefe {
   class Cart
   class Product
-}
-
-package "Domain" #fefefe {
+ }
   interface CartApi {
       +getCart(String cartId)
       +addProductToCart(String productRef, int quantityRequested, String cartId)
@@ -21,11 +20,35 @@ package "Domain" #fefefe {
   }
   class CartService
 
-  CartApi <|.. CartService : implement
+  CartService ..|> CartApi  : implement
   CartService ..|> CartPersistenceSpi: use
   CartService ..|> ProductSpi: use
   CartService ..|> StockSpi: use
   CartService ..|> Cart: use
   CartService ..|> Product: use
+}
+
+
+
+package "Infra" #fefefe {
+
+  class PersistenceService
+  class StockClientService
+  class ProductClientService
+  class CartRepository
+
+  CartPersistenceSpi <|.. PersistenceService : implement
+  ProductSpi <|.. ProductClientService : implement
+  StockSpi <|.. StockClientService : implement
+  PersistenceService ..|> CartRepository: use
+
+}
+
+package "Application" #fefefe {
+
+  class CartController
+
+  CartController ..|> CartService: use
+
 }
 @enduml
